@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     #Third party apps
     'rest_framework',
     'debug_toolbar',
+
+    #my apps
+    'odds',
 ]
 
 MIDDLEWARE = [

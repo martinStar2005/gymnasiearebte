@@ -1,6 +1,7 @@
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 
 from django.shortcuts import get_object_or_404
 
@@ -19,6 +20,21 @@ class MatchListView(APIView):
     def get(self, request):
         matches = Match.objects.all()
 
+        team = request.query_params.get("team")
+        status = request.query_params.get("status")
+
+        if team:
+            matches = matches.filter(
+                home_team__icontains=team 
+            ) | matches.filter(
+                away_team__icontains=team
+            )
+
+        if status:
+            matches = matches.filter(
+                status__iexact=status
+            )
+
         serializer = MatchSerializer(
             matches,
             many=True
@@ -27,40 +43,57 @@ class MatchListView(APIView):
         return Response(serializer.data)
 
 
-class MatchDetailView(APIView):
+class MatchDetailView(RetrieveAPIView):
 
-    def get(self, request, match_id):
-        match = get_object_or_404(Match, id=match_id)
+    # def get(self, request, match_id):
+    #     match = get_object_or_404(Match, id=match_id)
 
-        serializer = MatchSerializer(match)
+    #     serializer = MatchSerializer(match)
 
-        return Response(serializer.data)
+    #     return Response(serializer.data)
 
-
-class BookmakerListView(APIView):
-
-    def get(self, request):
-        bookmakers = Bookmaker.objects.all()
-
-        serializer = BookmakerSerializer(
-            bookmakers,
-            many=True
-        )
-
-        return Response(serializer.data)
+    queryset = Match.objects.all()
+    serializer_class = MatchSerializer
+    lookup_field = "id"
+    lookup_url_kwarg = "match_id"
 
 
-class CurrentOddsListView(APIView):
+class MatchCreateView(CreateAPIView):
 
-    def get(self, request):
-        odds = CurrentOdds.objects.all()
+    queryset = Match.objects.all()
+    serializer_class = MatchSerializer
 
-        serializer = CurrentOddsSerializer(
-            odds,
-            many=True
-        )
 
-        return Response(serializer.data)
+class BookmakerListView(ListAPIView):
+
+    # def get(self, request):
+    #     bookmakers = Bookmaker.objects.all()
+
+    #     serializer = BookmakerSerializer(
+    #         bookmakers,
+    #         many=True
+    #     )
+
+    #     return Response(serializer.data)
+
+    queryset = Bookmaker.objects.all()
+    serializer_class = BookmakerSerializer
+
+
+class CurrentOddsListView(ListAPIView):
+
+    # def get(self, request):
+    #     odds = CurrentOdds.objects.all()
+
+    #     serializer = CurrentOddsSerializer(
+    #         odds,
+    #         many=True
+    #     )
+
+    #     return Response(serializer.data)
+
+    queryset = CurrentOdds.objects.all()
+    serializer_class = CurrentOddsSerializer
 
 
 class MatchOddsView(APIView):
@@ -80,14 +113,17 @@ class MatchOddsView(APIView):
         return Response(serializer.data)
 
 
-class OddsHistoryListView(APIView):
+class OddsHistoryListView(ListAPIView):
 
-    def get(self, request):
-        history = OddsHistory.objects.all()
+    # def get(self, request):
+    #     history = OddsHistory.objects.all()
 
-        serializer = OddsHistorySerializer(
-            history,
-            many=True
-        )
+    #     serializer = OddsHistorySerializer(
+    #         history,
+    #         many=True
+    #     )
 
-        return Response(serializer.data)
+    #     return Response(serializer.data)
+    
+    queryset = OddsHistory.objects.all()
+    serializer_class = OddsHistorySerializer

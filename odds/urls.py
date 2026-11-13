@@ -38,4 +38,10 @@ urlpatterns = [
         views.MatchDetailView.as_view(),
         name="match-detail"
     ),
+
+    path(
+        "matches/create/",
+        views.MatchCreateView.as_view(),
+        name="match-create"
+    )
 ]
